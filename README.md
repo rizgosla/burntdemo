@@ -1,31 +1,33 @@
-# Burnt Crumbs — Homepage Mockup
+# Burnt Crumbs
 
-Static HTML/CSS/JS homepage mockup for Burnt Crumbs (Irvine, CA).
+Homepage for Burnt Crumbs (Irvine, CA), built with Astro + Tailwind v4.
+
+## Develop
+
+```
+npm install
+npm run dev
+```
+
+## Build
+
+```
+npm run build
+```
+
+Static output is emitted to `dist/`.
 
 ## Deploy to Cloudflare Pages
 
-1. Push this folder to a GitHub repo:
-   ```
-   git init
-   git add .
-   git commit -m "initial"
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   git push -u origin main
-   ```
+- **Framework preset**: Astro
+- **Build command**: `npm run build`
+- **Output directory**: `dist`
 
-2. Go to [Cloudflare Pages](https://pages.cloudflare.com/) → Create a project → Connect to Git
-
-3. Select your repo. Build settings:
-   - **Framework preset**: None
-   - **Build command**: *(leave empty)*
-   - **Output directory**: `/` (root)
-
-4. Deploy — Cloudflare will serve `index.html` automatically.
-
-## Files
+## Structure
 
 ```
-index.html   — Main page
-app.js       — Stop-motion + carousel interactions
-media/       — All images (hero shots, product photos, slideshow frames)
+src/pages/index.astro      — the homepage
+src/layouts/BurntLayout.astro — document shell + interactions (carousel, stop-motion, sticky CTA)
+src/styles/burnt.css       — palette, fonts, and animations
+public/media/              — all images (hero shots, product photos, slideshow frames)
 ```
