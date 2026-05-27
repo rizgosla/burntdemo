@@ -18,6 +18,33 @@ const slug = (s) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+const STORE = "https://direct.chownow.com/order/7543/locations/10100";
+const order = (id) => `${STORE}?menu_item_id=${id}`;
+
+// Per-item ChowNow deep links, keyed by the exact item name below.
+// Items without an entry fall back to the main store page.
+const SOUFFLE = order("2609972_3132168"); // all pancake options select kind on site
+const links = {
+  "Two Egg Plate": order("2609933_3132128"),
+  "Breakfast Quesadillas": order("M_335010_5197126"),
+  "Breakfast Burrito": order("M_335010_2609754"),
+  "Carne Asada Omelette": order("2609926_3132121"),
+  "Avocado Toast": order("M_335010_2609924"),
+  "Shredded Beef Chilaquiles": order("7552607_8740377"),
+  "Breakfast Salad": order("2609723_3131879"),
+  "Original": SOUFFLE,
+  "Strawberry Cream and Fresh Strawberry": SOUFFLE,
+  "Berry Compote and Vanilla Cream": SOUFFLE,
+  "Weekly Special: Mango Cream": SOUFFLE,
+  "Soft Scrambled Egg + Cheddar": order("2609944_3132139"),
+  "Bacon + Egg + Cheddar": order("2609731_3131887"),
+  "Sausage + Egg + Cheddar": order("2609946_3132141"),
+  "Pastrami Hash + Egg + Cheddar": order("2609950_3132145"),
+  "Country Fried Steak + Egg + Cheddar": order("3842664_4593215"),
+  "Nashville Hot Chicken": order("3320187_3969693"),
+  "Vietnamese Iced Coffee": order("2609761_5527495"),
+};
+
 const categories = [
   {
     name: "Breakfast Entrées",
@@ -193,16 +220,23 @@ const categories = [
           </h2>
           <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
             {c.items.map((name) => (
-              <div class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+              <a
+                href={links[name] ?? STORE}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Order ${name}`}
+                class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+              >
                 <img
                   src={`${M}/${slug(name)}.jpg`}
                   alt={name}
                   loading="lazy"
-                  class="absolute inset-0 -z-20 h-full w-full object-cover"
+                  class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
                 <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
-              </div>
+                <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
+              </a>
             ))}
           </div>
         </div>
