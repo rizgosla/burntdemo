@@ -25,6 +25,7 @@ const order = (id) => `${STORE}?menu_item_id=${id}`;
 // Items without an entry fall back to the main store page.
 const SOUFFLE = order("2609972_3132168"); // all pancake options select kind on site
 const links = {
+  // Breakfast Entrées
   "Two Egg Plate": order("2609933_3132128"),
   "Breakfast Quesadillas": order("M_335010_5197126"),
   "Breakfast Burrito": order("M_335010_2609754"),
@@ -32,17 +33,39 @@ const links = {
   "Avocado Toast": order("M_335010_2609924"),
   "Shredded Beef Chilaquiles": order("7552607_8740377"),
   "Breakfast Salad": order("2609723_3131879"),
+  "Carne Asada Salad": order("1887604_2260521"),
+  // Pancakes
   "Original": SOUFFLE,
   "Strawberry Cream and Fresh Strawberry": SOUFFLE,
   "Berry Compote and Vanilla Cream": SOUFFLE,
   "Weekly Special: Mango Cream": SOUFFLE,
+  // Breakfast Sandwiches
   "Soft Scrambled Egg + Cheddar": order("2609944_3132139"),
   "Bacon + Egg + Cheddar": order("2609731_3131887"),
   "Sausage + Egg + Cheddar": order("2609946_3132141"),
   "Pastrami Hash + Egg + Cheddar": order("2609950_3132145"),
   "Country Fried Steak + Egg + Cheddar": order("3842664_4593215"),
+  // Lunch Sandwiches
+  "Spaghetti Grilled Cheese": order("920786_1100898"),
+  "Fried Chicken Sandwich": order("920785_1100897"),
   "Nashville Hot Chicken": order("3320187_3969693"),
+  "Classic Club Sandwich": order("2312397_2773074"),
+  "Shredded Beef Sandwich": order("7505949_8691967"),
+  // Sides
+  "Bacon (3)": order("2609934_3132132"),
+  "Breakfast Sausage": order("2609728_3131884"),
+  "Biscuit + Gravy": order("3038773_3638772"),
+  "Biscuit": order("2609938_3132133"),
+  "Home Fried Potatoes": order("2609937_3132130"),
+  "Hand Cut Fries": order("1748263_2094329"),
+  "Fresh Cut Chips": order("920796_1100908"),
+  "Carne Asada Fries": order("1630789_1951727"),
+  "Kids Grilled Cheese": order("920801_1100913"),
+  // Drinks
+  "Soda": order("1887693_2260614"),
+  "Sweet Tea": order("922250_5527496"),
   "Vietnamese Iced Coffee": order("2609761_5527495"),
+  "Orange Juice": order("2609939_3132134"),
 };
 
 const categories = [
