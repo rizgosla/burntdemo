@@ -8,7 +8,9 @@ const arrow = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-
 const navLinks = [
   { label: "Menu", href: "/menu" },
   { label: "Story", href: "/#" },
-  { label: "Catering", href: "/#" },
+  { label: "Catering", href: "https://tmt.spotapps.co/catering?spot_id=73610&callback_url=http://burntcrumbs.com/#", external: true },
+  { label: "Merch", href: "https://burntcrumbs.bigcartel.com/", external: true },
+  { label: "Careers", href: "https://tmt.spotapps.co/job-listings?spot_id=73610&callback_url=http%3A%2F%2Fburntcrumbs.com%2F", external: true },
   { label: "Find Us", href: "/#" },
 ];
 
@@ -165,7 +167,7 @@ const categories = [
 
       <nav class="hidden items-center gap-8 md:flex">
         {navLinks.map((l) => (
-          <a href={l.href} class="font-display text-[13px] font-medium uppercase tracking-[0.14em] text-paperdim transition-colors hover:text-paper">{l.label}</a>
+          <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} class="font-display text-[13px] font-medium uppercase tracking-[0.14em] text-paperdim transition-colors hover:text-paper">{l.label}</a>
         ))}
       </nav>
 
@@ -196,7 +198,7 @@ const categories = [
     <div id="burnt-mobile-menu" class="hidden border-t border-paper/10 bg-ink px-4 pb-4 md:hidden">
       <nav class="flex flex-col">
         {navLinks.map((l) => (
-          <a href={l.href} class="border-b border-paper/10 py-3 font-display text-sm font-medium uppercase tracking-[0.14em] text-paperdim last:border-0">{l.label}</a>
+          <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} class="border-b border-paper/10 py-3 font-display text-sm font-medium uppercase tracking-[0.14em] text-paperdim last:border-0">{l.label}</a>
         ))}
       </nav>
     </div>
