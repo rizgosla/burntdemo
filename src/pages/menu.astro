@@ -7,11 +7,32 @@ const arrow = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-
 
 const navLinks = [
   { label: "Menu", href: "/menu" },
-  { label: "Story", href: "/#" },
+  { label: "Story", href: "/story" },
   { label: "Catering", href: "https://tmt.spotapps.co/catering?spot_id=73610&callback_url=http://burntcrumbs.com/#", external: true },
   { label: "Merch", href: "https://burntcrumbs.bigcartel.com/", external: true },
   { label: "Careers", href: "https://tmt.spotapps.co/job-listings?spot_id=73610&callback_url=http%3A%2F%2Fburntcrumbs.com%2F", external: true },
   { label: "Find Us", href: "/#" },
+];
+
+const socialLinks = [
+  {
+    label: "Yelp",
+    href: "https://www.yelp.com/biz/burnt-crumbs-irvine",
+    vb: "0 0 24 24",
+    icon: `<path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.847-.311.124-.611.094-.85-.09-.154-.12-.314-.365-2.447-3.827l-.055-.088c-.197-.315-.176-.703.054-.984a1.094 1.094 0 0 1 .977-.39l.103.012c3.868.572 4.081.637 4.242.728.37.21.517.559.445 1.096l-.44-.304zm-11.99-1.475a1.09 1.09 0 0 0-.975.477 1.096 1.096 0 0 0-.053.985l.042.099c.859 1.847 1.076 2.263 1.207 2.4.227.238.538.338.867.281.931-.163 2.754-2.461 2.832-3.459.05-.644-.289-1.077-.906-1.145l-.103-.012-2.911-.626zm-.072-6.617l-.103.012c-.617.068-.956.501-.906 1.145.077.998 1.9 3.296 2.832 3.459.329.057.64-.043.867-.281.13-.137.347-.553 1.206-2.4l.042-.099a1.096 1.096 0 0 0-.053-.985 1.09 1.09 0 0 0-.975-.477l-2.91.626zm7.777-5.22c-.496-.253-1.093-.199-1.477.037l-2.449 1.494c-.23.281-.251.669-.054.984l.055.088c2.133 3.462 2.293 3.708 2.447 3.827.239.184.539.214.85.09.91-.364 2.888-2.878 3.029-3.847.072-.537-.075-.886-.445-1.096-.161-.09-.374-.156-4.242-.728l-.313-.369zm-6.48-.506l-.103-.012c-.617-.068-1.1.28-1.204.849l-.753 4.258c-.18 1.09 1.064 1.96 2.014 1.367l2.91-1.782c.572-.35.71-.989.415-1.512-.163-.294-.457-.656-3.28-3.945z" fill="currentColor"/>`,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/burntcrumbs",
+    vb: "0 0 18 18",
+    icon: `<rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="4.5" r="0.8" fill="currentColor"/>`,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/burntcrumbs/",
+    vb: "0 0 18 18",
+    icon: `<path d="M11 6V4.5c0-.6.4-1 1-1h1V1h-2c-1.7 0-3 1.3-3 3v2H6v2h2v7h3V8h2l.5-2H11z" fill="currentColor"/>`,
+  },
 ];
 
 // Per-item object-position overrides for cards where the default
@@ -176,6 +197,14 @@ const categories = [
         ))}
       </nav>
 
+      <div class="hidden items-center gap-0.5 md:flex">
+        {socialLinks.map((s) => (
+          <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} class="grid h-9 w-9 place-items-center rounded-full text-paperdim transition-colors hover:text-paper">
+            <svg width="16" height="16" viewBox={s.vb} fill="none" set:html={s.icon}></svg>
+          </a>
+        ))}
+      </div>
+
       <div class="flex items-center gap-2">
         <a
           href={ORDER_NOW}
@@ -200,12 +229,19 @@ const categories = [
     </div>
 
     <!-- mobile dropdown -->
-    <div id="burnt-mobile-menu" class="hidden border-t border-paper/10 bg-ink px-4 pb-4 md:hidden">
+    <div id="burnt-mobile-menu" class="hidden border-t border-paper/10 bg-ink px-4 pb-5 md:hidden">
       <nav class="flex flex-col">
         {navLinks.map((l) => (
           <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} class="border-b border-paper/10 py-3 font-display text-sm font-medium uppercase tracking-[0.14em] text-paperdim last:border-0">{l.label}</a>
         ))}
       </nav>
+      <div class="mt-4 flex gap-1.5 border-t border-paper/10 pt-4">
+        {socialLinks.map((s) => (
+          <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} class="grid h-10 w-10 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:text-paper">
+            <svg width="16" height="16" viewBox={s.vb} fill="none" set:html={s.icon}></svg>
+          </a>
+        ))}
+      </div>
     </div>
   </header>
 

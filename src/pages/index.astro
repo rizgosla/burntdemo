@@ -3,6 +3,28 @@ import BurntLayout from "../layouts/BurntLayout.astro";
 
 const M = "/media";
 const ORDER_NOW = "https://direct.chownow.com/order/7543/locations/10100?source=pop_up&spot_id=73610&destination=order&promotion=order_online";
+const CATERING_URL = "https://tmt.spotapps.co/catering?spot_id=73610&callback_url=http://burntcrumbs.com/#";
+
+const socialLinks = [
+  {
+    label: "Yelp",
+    href: "https://www.yelp.com/biz/burnt-crumbs-irvine",
+    vb: "0 0 24 24",
+    icon: `<path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.847-.311.124-.611.094-.85-.09-.154-.12-.314-.365-2.447-3.827l-.055-.088c-.197-.315-.176-.703.054-.984a1.094 1.094 0 0 1 .977-.39l.103.012c3.868.572 4.081.637 4.242.728.37.21.517.559.445 1.096l-.44-.304zm-11.99-1.475a1.09 1.09 0 0 0-.975.477 1.096 1.096 0 0 0-.053.985l.042.099c.859 1.847 1.076 2.263 1.207 2.4.227.238.538.338.867.281.931-.163 2.754-2.461 2.832-3.459.05-.644-.289-1.077-.906-1.145l-.103-.012-2.911-.626zm-.072-6.617l-.103.012c-.617.068-.956.501-.906 1.145.077.998 1.9 3.296 2.832 3.459.329.057.64-.043.867-.281.13-.137.347-.553 1.206-2.4l.042-.099a1.096 1.096 0 0 0-.053-.985 1.09 1.09 0 0 0-.975-.477l-2.91.626zm7.777-5.22c-.496-.253-1.093-.199-1.477.037l-2.449 1.494c-.23.281-.251.669-.054.984l.055.088c2.133 3.462 2.293 3.708 2.447 3.827.239.184.539.214.85.09.91-.364 2.888-2.878 3.029-3.847.072-.537-.075-.886-.445-1.096-.161-.09-.374-.156-4.242-.728l-.313-.369zm-6.48-.506l-.103-.012c-.617-.068-1.1.28-1.204.849l-.753 4.258c-.18 1.09 1.064 1.96 2.014 1.367l2.91-1.782c.572-.35.71-.989.415-1.512-.163-.294-.457-.656-3.28-3.945z" fill="currentColor"/>`,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/burntcrumbs",
+    vb: "0 0 18 18",
+    icon: `<rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="13.5" cy="4.5" r="0.8" fill="currentColor"/>`,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/burntcrumbs/",
+    vb: "0 0 18 18",
+    icon: `<path d="M11 6V4.5c0-.6.4-1 1-1h1V1h-2c-1.7 0-3 1.3-3 3v2H6v2h2v7h3V8h2l.5-2H11z" fill="currentColor"/>`,
+  },
+];
 
 const arrow = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10m0 0L8 3m4 4l-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -48,7 +70,7 @@ const reviews = [
 
 const navLinks = [
   { label: "Menu", href: "/menu" },
-  { label: "Story", href: "#" },
+  { label: "Story", href: "/story" },
   { label: "Catering", href: "https://tmt.spotapps.co/catering?spot_id=73610&callback_url=http://burntcrumbs.com/#", external: true },
   { label: "Merch", href: "https://burntcrumbs.bigcartel.com/", external: true },
   { label: "Careers", href: "https://tmt.spotapps.co/job-listings?spot_id=73610&callback_url=http%3A%2F%2Fburntcrumbs.com%2F", external: true },
@@ -75,6 +97,14 @@ const navLinks = [
         ))}
       </nav>
 
+      <div class="hidden items-center gap-0.5 md:flex">
+        {socialLinks.map((s) => (
+          <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} class="grid h-9 w-9 place-items-center rounded-full text-paperdim transition-colors hover:text-paper">
+            <svg width="16" height="16" viewBox={s.vb} fill="none" set:html={s.icon}></svg>
+          </a>
+        ))}
+      </div>
+
       <div class="flex items-center gap-2">
         <a
           href={ORDER_NOW}
@@ -99,12 +129,19 @@ const navLinks = [
     </div>
 
     <!-- mobile dropdown -->
-    <div id="burnt-mobile-menu" class="hidden border-t border-paper/10 bg-ink px-4 pb-4 md:hidden">
+    <div id="burnt-mobile-menu" class="hidden border-t border-paper/10 bg-ink px-4 pb-5 md:hidden">
       <nav class="flex flex-col">
         {navLinks.map((l) => (
           <a href={l.href} {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} class="border-b border-paper/10 py-3 font-display text-sm font-medium uppercase tracking-[0.14em] text-paperdim last:border-0">{l.label}</a>
         ))}
       </nav>
+      <div class="mt-4 flex gap-1.5 border-t border-paper/10 pt-4">
+        {socialLinks.map((s) => (
+          <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} class="grid h-10 w-10 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:text-paper">
+            <svg width="16" height="16" viewBox={s.vb} fill="none" set:html={s.icon}></svg>
+          </a>
+        ))}
+      </div>
     </div>
   </header>
 
@@ -176,7 +213,7 @@ const navLinks = [
         <p class="burnt-dropcap my-4 font-serif text-base leading-[1.6] text-char/[0.78] md:text-[17px]">
           In college, Chef Paul Cao fried his spaghetti to crisp the bottom. His roommates called it <em class="italic">burnt spaghetti</em>. The name caught on. The food truck followed in 2010. Today the truck is a kitchen on Irvine Center Drive — same crispy edges, same scratch-made sauces, same chef.
         </p>
-        <a href="#" class="inline-flex items-center gap-2 border-b-[1.5px] border-char pb-0.5 font-display text-[13px] font-semibold uppercase tracking-[0.1em] text-char">
+        <a href="/story" class="inline-flex items-center gap-2 border-b-[1.5px] border-char pb-0.5 font-display text-[13px] font-semibold uppercase tracking-[0.1em] text-char">
           Read the full story <Fragment set:html={arrow} />
         </a>
       </div>
@@ -387,14 +424,14 @@ const navLinks = [
           ))}
         </div>
       </div>
-      <div class="relative aspect-[16/11] overflow-hidden rounded-[18px]">
-        <img src={`${M}/p-table-yellow.jpg`} alt="Catering spread of scratch-made dishes from Burnt Crumbs" class="h-full w-full object-cover" />
+      <a href={CATERING_URL} target="_blank" rel="noopener noreferrer" class="group relative block aspect-[16/11] overflow-hidden rounded-[18px]">
+        <img src={`${M}/p-table-yellow.jpg`} alt="Catering spread of scratch-made dishes from Burnt Crumbs" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(26,20,16,0.1)_30%,rgba(26,20,16,0.85))]"></div>
         <div class="absolute inset-x-4 bottom-4 text-paper">
           <h3 class="font-display text-4xl font-bold uppercase leading-[0.94] tracking-[0.01em]">Get a catering quote →</h3>
           <p class="mt-1.5 font-serif text-sm italic opacity-85">Hit reply within 12 hours. Promise.</p>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 
@@ -465,24 +502,11 @@ const navLinks = [
         <div>
           <p class="max-w-[30ch] font-serif text-[15px] italic leading-[1.4] text-paper/55">Scratch-made since 2010. Started as The Burnt Truck. Still chef-run, still family.</p>
           <div class="mt-6 flex flex-wrap gap-2.5">
-            <a href="https://www.yelp.com/biz/burnt-crumbs-irvine" target="_blank" rel="noopener noreferrer" aria-label="Yelp" class="grid h-11 w-11 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:border-ember hover:text-ember">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M4.5 3.5L8 9v5h2V9l3.5-5.5H11L9 7 7 3.5H4.5z" fill="currentColor"/>
-                <path d="M8 14h2v1H8z" fill="currentColor"/>
-              </svg>
-            </a>
-            <a href="https://www.instagram.com/burntcrumbs" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="grid h-11 w-11 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:border-ember hover:text-ember">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.4"/>
-                <circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/>
-                <circle cx="13.5" cy="4.5" r="0.8" fill="currentColor"/>
-              </svg>
-            </a>
-            <a href="https://www.facebook.com/burntcrumbs/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="grid h-11 w-11 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:border-ember hover:text-ember">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M11 6V4.5c0-.6.4-1 1-1h1V1h-2c-1.7 0-3 1.3-3 3v2H6v2h2v7h3V8h2l.5-2H11z" fill="currentColor"/>
-              </svg>
-            </a>
+            {socialLinks.map((s) => (
+              <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} class="grid h-11 w-11 place-items-center rounded-full border border-paper/20 text-paperdim transition-colors hover:border-ember hover:text-ember">
+                <svg width="18" height="18" viewBox={s.vb} fill="none" set:html={s.icon}></svg>
+              </a>
+            ))}
           </div>
         </div>
 
