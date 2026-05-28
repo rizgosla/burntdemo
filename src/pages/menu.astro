@@ -12,6 +12,12 @@ const navLinks = [
   { label: "Find Us", href: "/#" },
 ];
 
+// Per-item object-position overrides for cards where the default
+// "center center" crop hides the subject. Values map to CSS object-position.
+const imagePosition = {
+  "Breakfast Quesadillas": "65% center",
+};
+
 const slug = (s) =>
   s
     .toLowerCase()
@@ -19,6 +25,7 @@ const slug = (s) =>
     .replace(/^-+|-+$/g, "");
 
 const STORE = "https://direct.chownow.com/order/7543/locations/10100";
+const ORDER_NOW = "https://direct.chownow.com/order/7543/locations/10100?source=pop_up&spot_id=73610&destination=order&promotion=order_online";
 const order = (id) => `${STORE}?menu_item_id=${id}`;
 
 // Per-item ChowNow deep links, keyed by the exact item name below.
@@ -164,7 +171,9 @@ const categories = [
 
       <div class="flex items-center gap-2">
         <a
-          href="#"
+          href={ORDER_NOW}
+          target="_blank"
+          rel="noopener noreferrer"
           class="inline-flex items-center gap-1.5 rounded-full bg-ember px-4 py-2.5 font-display text-[13px] font-semibold uppercase tracking-[0.1em] text-paper shadow-[0_4px_16px_rgba(197,69,58,0.45),inset_0_1px_0_rgba(255,255,255,0.18)]"
           >Order</a
         >
@@ -235,10 +244,7 @@ const categories = [
         hidden={i !== 0}
       >
         <div class="mx-auto max-w-screen-xl">
-          <div class="font-display text-[11px] font-medium uppercase tracking-[0.2em] text-char/55">
-            <span class="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-ember align-middle"></span>{c.eyebrow}
-          </div>
-          <h2 class="mb-7 mt-3 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
+          <h2 class="mb-7 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
             {c.name}
           </h2>
           <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
@@ -254,6 +260,7 @@ const categories = [
                   src={`${M}/${slug(name)}.jpg`}
                   alt={name}
                   loading="lazy"
+                  style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
                   class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
