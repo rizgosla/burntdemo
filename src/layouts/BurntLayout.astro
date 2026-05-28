@@ -4,12 +4,56 @@ import "../styles/burnt.css";
 interface Props {
   title?: string;
   description?: string;
+  canonical?: string;
+  ogImage?: string;
 }
 
 const {
-  title = "Burnt Crumbs · Keeping it #ScratchMade",
-  description = "Scratch-made comfort food in Irvine, CA. Home of the spaghetti grilled cheese, soufflé pancakes, and sauce by the ounce.",
+  title = "Burnt Crumbs | Best Brunch & Breakfast in Irvine, CA",
+  description = "Scratch-made brunch and breakfast in Irvine, CA. Home of the spaghetti grilled cheese, soufflé pancakes, Nashville hot chicken, and sauce by the ounce. Est. 2010.",
+  canonical = "https://burntcrumbs.com/",
+  ogImage = "https://burntcrumbs.com/media/burnt-title.jpg",
 } = Astro.props;
+
+const restaurantSchema = {
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Burnt Crumbs",
+  "url": "https://burntcrumbs.com",
+  "telephone": "+19495025998",
+  "priceRange": "$$",
+  "servesCuisine": ["American", "Brunch", "Breakfast", "Sandwiches"],
+  "description": "Scratch-made brunch and breakfast restaurant in Irvine, CA. Est. 2010. Chef-run, family-owned.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "8549 Irvine Center Dr",
+    "addressLocality": "Irvine",
+    "addressRegion": "CA",
+    "postalCode": "92618",
+    "addressCountry": "US"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 33.6454,
+    "longitude": -117.7688
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+      "opens": "08:30",
+      "closes": "15:00"
+    }
+  ],
+  "hasMenu": "https://burntcrumbs.com/menu",
+  "menu": "https://burntcrumbs.com/menu",
+  "sameAs": [
+    "https://www.instagram.com/burntcrumbs",
+    "https://www.facebook.com/burntcrumbs/",
+    "https://www.yelp.com/biz/burnt-crumbs-irvine"
+  ],
+  "image": "https://burntcrumbs.com/media/burnt-title.jpg"
+};
 ---
 
 <!doctype html>
@@ -20,6 +64,25 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0e0a07" />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:site_name" content="Burnt Crumbs" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Restaurant Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(restaurantSchema)} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
