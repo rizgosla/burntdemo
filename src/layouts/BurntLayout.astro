@@ -332,12 +332,20 @@ const restaurantSchema = {
         const nav = $("#burnt-nav");
         const sticky = $("#burnt-sticky");
         const hero = $("#burnt-hero");
+
+        // Mon–Sun 8:30 AM – 3:00 PM Pacific Time
+        const isOpenNow = () => {
+          const pt = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+          const mins = pt.getHours() * 60 + pt.getMinutes();
+          return mins >= 510 && mins < 900; // 510 = 8:30, 900 = 15:00
+        };
+
         const onScroll = () => {
           const y = window.scrollY || document.documentElement.scrollTop;
           nav?.classList.toggle("shadow-lg", y > 80);
           if (hero && sticky) {
             const heroBottom = hero.offsetTop + hero.offsetHeight;
-            const on = y > heroBottom - 200;
+            const on = y > heroBottom - 200 && isOpenNow();
             sticky.classList.toggle("opacity-0", !on);
             sticky.classList.toggle("translate-y-6", !on);
             sticky.classList.toggle("pointer-events-none", !on);
