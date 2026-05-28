@@ -12,10 +12,10 @@ const navLinks = [
   { label: "Find Us", href: "/#" },
 ];
 
-// Per-item image transform overrides for cards where the default crop
-// hides the subject. Applied as an inline style on the card image.
-const imageStyle = {
-  "Breakfast Quesadillas": "transform: scale(1.15) translateX(-8%); transform-origin: center;",
+// Per-item object-position overrides for cards where the default
+// "center center" crop hides the subject. Values map to CSS object-position.
+const imagePosition = {
+  "Breakfast Quesadillas": "65% center",
 };
 
 const slug = (s) =>
@@ -260,7 +260,7 @@ const categories = [
                   src={`${M}/${slug(name)}.jpg`}
                   alt={name}
                   loading="lazy"
-                  style={imageStyle[name]}
+                  style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
                   class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
