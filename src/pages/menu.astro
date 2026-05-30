@@ -41,6 +41,17 @@ const imagePosition = {
   "Breakfast Quesadillas": "65% center",
 };
 
+// Items without a photo — rendered as text rows at the bottom of their category.
+const noImage = new Set([
+  "Bacon (3)",
+  "Breakfast Sausage",
+  "Biscuit + Gravy",
+  "Biscuit",
+  "Home Fried Potatoes",
+  "Soda",
+  "Hot Coffee",
+]);
+
 const slug = (s) =>
   s
     .toLowerCase()
@@ -279,42 +290,68 @@ const categories = [
 
   <!-- ── Category Sections ─────────────────────────────────────────── -->
   <main class="bg-paper">
-    {categories.map((c, i) => (
-      <section
-        id={`cat-${c.slug}`}
-        class="menu-section px-5 py-12 md:px-8 md:py-16 lg:px-12"
-        data-target={`cat-${c.slug}`}
-        hidden={i !== 0}
-      >
-        <div class="mx-auto max-w-screen-xl">
-          <h2 class="mb-7 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
-            {c.name}
-          </h2>
-          <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
-            {c.items.map((name) => (
-              <a
-                href={links[name] ?? STORE}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Order ${name}`}
-                class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
-              >
-                <img
-                  src={`${M}/${slug(name)}.jpg`}
-                  alt={name}
-                  loading="lazy"
-                  style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
-                  class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
-                <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
-                <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
-              </a>
-            ))}
+    {categories.map((c, i) => {
+      const imageItems = c.items.filter(n => !noImage.has(n));
+      const textItems  = c.items.filter(n =>  noImage.has(n));
+      return (
+        <section
+          id={`cat-${c.slug}`}
+          class="menu-section px-5 py-12 md:px-8 md:py-16 lg:px-12"
+          data-target={`cat-${c.slug}`}
+          hidden={i !== 0}
+        >
+          <div class="mx-auto max-w-screen-xl">
+            <h2 class="mb-7 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
+              {c.name}
+            </h2>
+
+            {imageItems.length > 0 && (
+              <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+                {imageItems.map((name) => (
+                  <a
+                    href={links[name] ?? STORE}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Order ${name}`}
+                    class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+                  >
+                    <img
+                      src={`${M}/${slug(name)}.jpg`}
+                      alt={name}
+                      loading="lazy"
+                      style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
+                      class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
+                    <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
+                    <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {textItems.length > 0 && (
+              <div class={`flex flex-col gap-2.5 ${imageItems.length > 0 ? "mt-3.5" : ""}`}>
+                {textItems.map((name) => (
+                  <a
+                    href={links[name] ?? STORE}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Order ${name}`}
+                    class="group flex items-center justify-between gap-4 rounded-[14px] bg-char px-5 py-4 text-paper shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-transform hover:-translate-y-0.5"
+                  >
+                    <span class="font-display text-[17px] font-bold uppercase leading-none tracking-[0.01em]">{name}</span>
+                    <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper/10 text-paper transition-colors group-hover:bg-ember">
+                      <Fragment set:html={arrow} />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
-    ))}
+        </section>
+      );
+    })}
   </main>
 
   <!-- ── Footer ────────────────────────────────────────────────────── -->
