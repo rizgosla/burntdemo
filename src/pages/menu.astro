@@ -314,9 +314,14 @@ const categories = [
                   aria-label={`Order ${name}`}
                   class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-char p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
                 >
-                  <span class="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(197,69,58,0.12)_0%,transparent_65%)]"></span>
-                  <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 overflow-hidden px-3 text-center font-serif text-[56px] italic font-bold leading-none tracking-tight text-paper/[0.07] select-none">{name}</span>
-                  <span class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-t from-char/70 to-transparent"></span>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 flex select-none flex-col justify-around overflow-hidden">
+                    {[16, 23, 18, 26, 15, 21, 19].map((dur, row) => (
+                      <div class={row % 2 === 0 ? "marq-l" : "marq-r"} style={`animation-duration:${dur}s`}>
+                        <span class="font-display text-[9px] font-bold uppercase tracking-[0.18em] text-ember/50">{`${name} · `.repeat(30)}</span><span class="font-display text-[9px] font-bold uppercase tracking-[0.18em] text-ember/50">{`${name} · `.repeat(30)}</span>
+                      </div>
+                    ))}
+                  </span>
+                  <span class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-t from-char/80 to-transparent"></span>
                   <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
                   <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper/10 text-paper transition-colors group-hover:bg-ember">
                     <Fragment set:html={arrow} />
@@ -371,6 +376,13 @@ const categories = [
       <span class="flex gap-2.5"><a href="#">Privacy</a><a href="#">Terms</a></span>
     </div>
   </footer>
+
+  <style>
+    @keyframes marq-l { to   { transform: translateX(-50%); } }
+    @keyframes marq-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    .marq-l { animation: marq-l var(--dur, 16s) linear infinite; white-space: nowrap; }
+    .marq-r { animation: marq-r var(--dur, 20s) linear infinite; white-space: nowrap; }
+  </style>
 
   <script is:inline>
     (() => {
