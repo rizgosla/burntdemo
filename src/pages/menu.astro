@@ -315,9 +315,20 @@ const categories = [
                   class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-char p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
                 >
                   <span aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 flex select-none flex-col justify-around overflow-hidden">
-                    {[16, 23, 18, 26, 15, 21, 19].map((dur, row) => (
-                      <div class={row % 2 === 0 ? "marq-l" : "marq-r"} style={`animation-duration:${dur}s`}>
-                        <span class="font-display text-[9px] font-bold uppercase tracking-[0.18em] text-ember/50">{`${name} · `.repeat(30)}</span><span class="font-display text-[9px] font-bold uppercase tracking-[0.18em] text-ember/50">{`${name} · `.repeat(30)}</span>
+                    {[22, 28, 18, 32, 20, 26, 24, 30, 16, 28].map((dur, row) => (
+                      <div
+                        class={`${row % 2 === 0 ? "burnt-marquee-track" : "burnt-marquee-track-r"} flex gap-5 whitespace-nowrap font-display text-[11px] font-medium uppercase tracking-[0.2em] text-ember/60`}
+                        style={`animation-duration:${dur}s`}
+                      >
+                        {[0, 1].map(() => (
+                          <div class="flex shrink-0 gap-5">
+                            {Array.from({length: 10}).map(() => (
+                              <span class="inline-flex items-center gap-3">
+                                {name}<span class="inline-block h-[4px] w-[4px] rounded-full bg-current"></span>
+                              </span>
+                            ))}
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </span>
@@ -376,13 +387,6 @@ const categories = [
       <span class="flex gap-2.5"><a href="#">Privacy</a><a href="#">Terms</a></span>
     </div>
   </footer>
-
-  <style>
-    @keyframes marq-l { to   { transform: translateX(-50%); } }
-    @keyframes marq-r { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-    .marq-l { animation: marq-l var(--dur, 16s) linear infinite; white-space: nowrap; }
-    .marq-r { animation: marq-r var(--dur, 20s) linear infinite; white-space: nowrap; }
-  </style>
 
   <script is:inline>
     (() => {

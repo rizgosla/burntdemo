@@ -50,6 +50,13 @@ body {
 .burnt-marquee-track {
   animation: burnt-scroll-x 22s linear infinite;
 }
+@keyframes burnt-scroll-x-r {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+.burnt-marquee-track-r {
+  animation: burnt-scroll-x-r 22s linear infinite;
+}
 
 /* ── Hero scroll hint ────────────────────────────────────── */
 @keyframes burnt-drop {
@@ -116,6 +123,7 @@ body {
 /* Respect reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .burnt-marquee-track,
+  .burnt-marquee-track-r,
   .burnt-drop-line {
     animation: none;
   }
