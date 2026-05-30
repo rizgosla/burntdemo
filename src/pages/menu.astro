@@ -305,51 +305,44 @@ const categories = [
               {c.name}
             </h2>
 
-            {imageItems.length > 0 && (
-              <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
-                {imageItems.map((name) => (
-                  <a
-                    href={links[name] ?? STORE}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Order ${name}`}
-                    class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
-                  >
-                    <img
-                      src={`${M}/${slug(name)}.jpg`}
-                      alt={name}
-                      loading="lazy"
-                      style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
-                      class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
-                    <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
-                    <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {textItems.length > 0 && (
-              <div class={`grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4 ${imageItems.length > 0 ? "mt-3.5" : ""}`}>
-                {textItems.map((name) => (
-                  <a
-                    href={links[name] ?? STORE}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Order ${name}`}
-                    class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-char p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
-                  >
-                    <span class="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(197,69,58,0.12)_0%,transparent_65%)]"></span>
-                    <span class="absolute -right-6 -top-6 -z-10 h-28 w-28 rounded-full bg-ember/10 blur-2xl"></span>
-                    <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
-                    <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper/10 text-paper transition-colors group-hover:bg-ember">
-                      <Fragment set:html={arrow} />
-                    </span>
-                  </a>
-                ))}
-              </div>
-            )}
+            <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+              {[...imageItems, ...textItems].map((name) => noImage.has(name) ? (
+                <a
+                  href={links[name] ?? STORE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Order ${name}`}
+                  class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-char p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+                >
+                  <span class="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(197,69,58,0.12)_0%,transparent_65%)]"></span>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 overflow-hidden px-3 text-center font-serif text-[56px] italic font-bold leading-none tracking-tight text-paper/[0.07] select-none">{name}</span>
+                  <span class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-t from-char/70 to-transparent"></span>
+                  <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
+                  <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper/10 text-paper transition-colors group-hover:bg-ember">
+                    <Fragment set:html={arrow} />
+                  </span>
+                </a>
+              ) : (
+                <a
+                  href={links[name] ?? STORE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Order ${name}`}
+                  class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+                >
+                  <img
+                    src={`${M}/${slug(name)}.jpg`}
+                    alt={name}
+                    loading="lazy"
+                    style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
+                    class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
+                  <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
+                  <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
+                </a>
+              ))}
+            </div>
           </div>
         </section>
       );
