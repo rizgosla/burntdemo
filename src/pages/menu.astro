@@ -41,6 +41,17 @@ const imagePosition = {
   "Breakfast Quesadillas": "65% center",
 };
 
+// Items without a photo — rendered as text rows at the bottom of their category.
+const noImage = new Set([
+  "Bacon (3)",
+  "Breakfast Sausage",
+  "Biscuit + Gravy",
+  "Biscuit",
+  "Home Fried Potatoes",
+  "Soda",
+  "Hot Coffee",
+]);
+
 const slug = (s) =>
   s
     .toLowerCase()
@@ -279,42 +290,79 @@ const categories = [
 
   <!-- ── Category Sections ─────────────────────────────────────────── -->
   <main class="bg-paper">
-    {categories.map((c, i) => (
-      <section
-        id={`cat-${c.slug}`}
-        class="menu-section px-5 py-12 md:px-8 md:py-16 lg:px-12"
-        data-target={`cat-${c.slug}`}
-        hidden={i !== 0}
-      >
-        <div class="mx-auto max-w-screen-xl">
-          <h2 class="mb-7 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
-            {c.name}
-          </h2>
-          <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
-            {c.items.map((name) => (
-              <a
-                href={links[name] ?? STORE}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Order ${name}`}
-                class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
-              >
-                <img
-                  src={`${M}/${slug(name)}.jpg`}
-                  alt={name}
-                  loading="lazy"
-                  style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
-                  class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
-                <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
-                <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
-              </a>
-            ))}
+    {categories.map((c, i) => {
+      const imageItems = c.items.filter(n => !noImage.has(n));
+      const textItems  = c.items.filter(n =>  noImage.has(n));
+      return (
+        <section
+          id={`cat-${c.slug}`}
+          class="menu-section px-5 py-12 md:px-8 md:py-16 lg:px-12"
+          data-target={`cat-${c.slug}`}
+          hidden={i !== 0}
+        >
+          <div class="mx-auto max-w-screen-xl">
+            <h2 class="mb-7 font-display text-[44px] font-bold uppercase leading-[0.94] tracking-[-0.01em] text-char md:text-[56px]">
+              {c.name}
+            </h2>
+
+            <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+              {[...imageItems, ...textItems].map((name) => noImage.has(name) ? (
+                <a
+                  href={links[name] ?? STORE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Order ${name}`}
+                  class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-char p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+                >
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 flex select-none flex-col justify-around overflow-hidden">
+                    {[22, 28, 18, 32, 20, 26, 24, 30, 16, 28].map((dur, row) => (
+                      <div
+                        class={`${row % 2 === 0 ? "burnt-marquee-track" : "burnt-marquee-track-r"} flex gap-5 whitespace-nowrap font-display text-[11px] font-medium uppercase tracking-[0.2em] text-ember/60`}
+                        style={`animation-duration:${dur}s`}
+                      >
+                        {[0, 1].map(() => (
+                          <div class="flex shrink-0 gap-5">
+                            {Array.from({length: 10}).map(() => (
+                              <span class="inline-flex items-center gap-3">
+                                {name}<span class="inline-block h-[4px] w-[4px] rounded-full bg-current"></span>
+                              </span>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </span>
+                  <span class="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-t from-char/80 to-transparent"></span>
+                  <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
+                  <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper/10 text-paper transition-colors group-hover:bg-ember">
+                    <Fragment set:html={arrow} />
+                  </span>
+                </a>
+              ) : (
+                <a
+                  href={links[name] ?? STORE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Order ${name}`}
+                  class="group relative isolate flex aspect-[4/5] items-end overflow-hidden rounded-[18px] bg-[#2a1d15] p-3.5 text-paper shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-0.5"
+                >
+                  <img
+                    src={`${M}/${slug(name)}.jpg`}
+                    alt={name}
+                    loading="lazy"
+                    style={imagePosition[name] ? `object-position: ${imagePosition[name]}` : undefined}
+                    class="absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <span class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.5)_60%,rgba(0,0,0,0.82)_100%)]"></span>
+                  <div class="font-display text-[19px] font-bold uppercase leading-[1.02] tracking-[0.01em] md:text-[22px]">{name}</div>
+                  <span class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-paper text-char opacity-90"><Fragment set:html={arrow} /></span>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-    ))}
+        </section>
+      );
+    })}
   </main>
 
   <!-- ── Footer ────────────────────────────────────────────────────── -->
@@ -329,7 +377,7 @@ const categories = [
       <div class="mt-8 md:mt-0">
         <div class="grid grid-cols-2 gap-[18px_14px]">
           {["Order Online", "Catering", "Full Menu", "Merch", "Our Story", "Contact"].map((l) => (
-            <a href={l === "Full Menu" ? "/menu" : "/"} class="font-display text-[13px] font-medium uppercase tracking-[0.06em] text-paper">{l} <span class="ml-1 text-ember">↗</span></a>
+            <a href={l === "Full Menu" ? "/menu" : l === "Our Story" ? "/story" : "/"} class="font-display text-[13px] font-medium uppercase tracking-[0.06em] text-paper">{l} <span class="ml-1 text-ember">↗</span></a>
           ))}
         </div>
       </div>
