@@ -11,7 +11,6 @@ const navLinks = [
   { label: "Catering", href: "https://tmt.spotapps.co/catering?spot_id=73610&callback_url=http://burntcrumbs.com/#", external: true },
   { label: "Merch", href: "https://burntcrumbs.bigcartel.com/", external: true },
   { label: "Careers", href: "https://tmt.spotapps.co/job-listings?spot_id=73610&callback_url=http%3A%2F%2Fburntcrumbs.com%2F", external: true },
-  { label: "Find Us", href: "/#" },
 ];
 
 const socialLinks = [
@@ -374,8 +373,8 @@ const categories = [
         </div>
         <p class="mt-[18px] max-w-[30ch] font-serif text-[15px] italic leading-[1.4] text-paper/55">Scratch-made since 2010. Started as The Burnt Truck. Still chef-run, still family.</p>
       </div>
-      <div class="mt-8 md:mt-0">
-        <div class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+      <div class="mt-8 md:mt-0 md:flex md:justify-end">
+        <div class="grid grid-cols-2 gap-x-10 gap-y-3.5">
           {["Order Online", "Catering", "Full Menu", "Merch", "Our Story", "Contact"].map((l) => (
             <a href={l === "Full Menu" ? "/menu" : l === "Our Story" ? "/story" : "/"} class="font-display text-[13px] font-medium uppercase tracking-[0.06em] text-paper">{l} <span class="ml-1 text-ember">↗</span></a>
           ))}
