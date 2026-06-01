@@ -158,8 +158,10 @@ const restaurantSchema = {
           // wait until scrolling settles, then silently shift the scroll
           // position back into the middle band — onto the identical cloned card,
           // so the seam is invisible. The deep buffer means a single continuous
-          // drag never runs out of cards before it settles.
-          const SETS = 2;
+          // drag (or fast inertial fling) never runs out of cards before it
+          // settles — too few sets and a fast scroll slams into the real edge,
+          // which reads as a jump.
+          const SETS = 4;
           const originals = $$(".burnt-card", carousel);
           const N = originals.length;
           const MID = SETS * N; // index of the first "real" (middle-band) card
@@ -246,11 +248,41 @@ const restaurantSchema = {
             }
           };
 
+          // Safety net for very fast flings: if a single gesture's momentum
+          // carries us within one band of the cloned edges before it settles,
+          // shift back toward the middle band right away. Because we move by a
+          // whole number of bands onto the identical card, the layout is
+          // pixel-identical and the shift is invisible — but it stops us ever
+          // reaching the real edge (which would hard-stop the scroll and look
+          // like a jump). We never do this while a pointer is actively dragging
+          // — repositioning then fights touch tracking and looks choppy — only
+          // during inertial / wheel scrolling.
+          let dragging = false;
+          const onDragEnd = () => (dragging = false);
+          carousel.addEventListener(
+            "pointerdown",
+            () => (dragging = true),
+            { passive: true }
+          );
+          window.addEventListener("pointerup", onDragEnd, { passive: true });
+          window.addEventListener("pointercancel", onDragEnd, { passive: true });
+
+          const edgeGuard = () => {
+            if (dragging) return;
+            const c = closestIndex();
+            if (c >= N && c < cards.length - N) return; // still deep in buffer
+            const logical = ((c % N) + N) % N;
+            const target = MID + logical;
+            if (target !== c)
+              carousel.scrollLeft += centerOf(cards[target]) - centerOf(cards[c]);
+          };
+
           const hasScrollEnd = "onscrollend" in carousel;
           carousel.addEventListener(
             "scroll",
             () => {
               requestAnimationFrame(update);
+              edgeGuard();
               // scrollend fires only after snap settles; the timeout is a
               // fallback for browsers without it (and is long enough not to
               // interrupt an in-flight snap).
