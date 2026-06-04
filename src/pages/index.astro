@@ -242,11 +242,12 @@ const navLinks = [
            flinging fast. The curved 3D look is layered on top in JS by
            transforming each card's inner wrapper based on its distance from
            the viewport centre. -->
-      <div id="carousel" class="absolute inset-0 overflow-hidden [perspective:1200px]">
+      <div id="carousel" class="absolute inset-0 overflow-hidden [perspective:1200px]" data-count={dishes.length}>
         <div class="burnt-track flex h-full gap-[18px]">
-          {dishes.map((d) => (
+          {[0, 1, 2].flatMap(() => dishes).map((d, i) => (
             <div
               class="burnt-card flex-[0_0_220px]"
+              data-idx={i % dishes.length}
               data-name={d.name.join(" ")}
               data-price={d.price}
             >

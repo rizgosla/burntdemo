@@ -224,6 +224,11 @@ const restaurantSchema = {
         );
 
         const slides = embla.slideNodes();
+        // Unique dish count. Slides are rendered in repeated sets (see
+        // index.astro) so Embla always has enough cards to wrap the loop on any
+        // viewport width — each card is tagged with its logical dish index.
+        const N = Number(viewport.dataset.count) || slides.length;
+        const idxOf = (slide) => Number(slide.dataset.idx) || 0;
 
         // Auto-advance; any direct interaction pauses it, and it resumes after
         // a few idle seconds. Declared early so the dot handlers can call it.
@@ -243,8 +248,8 @@ const restaurantSchema = {
           resumeTimer = setTimeout(startAuto, 5000);
         };
 
-        // Navigation dots.
-        const dotButtons = slides.map((_, i) => {
+        // One dot per unique dish.
+        const dotButtons = Array.from({ length: N }, (_, i) => {
           const b = document.createElement("button");
           b.className = "burnt-dot";
           b.setAttribute("aria-label", `Go to dish ${i + 1}`);
@@ -252,20 +257,53 @@ const restaurantSchema = {
             "width:6px;height:6px;border-radius:99px;background:rgba(245,237,224,0.25);border:0;padding:0;transition:width 200ms,background 200ms;";
           b.addEventListener("click", () => {
             pauseThenResume();
-            embla.scrollTo(i);
+            // Jump to whichever copy of this dish is nearest the current slide.
+            const cur = embla.selectedScrollSnap();
+            let best = cur;
+            let bestDist = Infinity;
+            slides.forEach((s, si) => {
+              if (idxOf(s) !== i) return;
+              const d = Math.abs(si - cur);
+              if (d < bestDist) {
+                bestDist = d;
+                best = si;
+              }
+            });
+            embla.scrollTo(best);
           });
           dotsWrap.appendChild(b);
           return b;
         });
 
+        // Live readout (number / name / price + active dot) follows whichever
+        // card is currently centred. Only writes when the logical dish changes.
+        let activeIdx = -1;
+        const setActive = (logical, slide) => {
+          if (logical === activeIdx) return;
+          activeIdx = logical;
+          numEl.textContent = String(logical + 1).padStart(2, "0");
+          if (slide) {
+            nameEl.textContent = slide.dataset.name || "";
+            priceEl.textContent = slide.dataset.price || "";
+          }
+          dotButtons.forEach((b, di) => {
+            b.style.background =
+              di === logical ? "var(--color-ember)" : "rgba(245,237,224,0.25)";
+            b.style.width = di === logical ? "18px" : "6px";
+          });
+        };
+
         // Curved 3D look: transform each card's inner wrapper by how far its
-        // centre sits from the viewport centre. We measure the slide (which
+        // centre sits from the viewport centre, and track the closest card so
+        // the readout updates live as you scroll. We measure the slide (which
         // carries Embla's own loop/scroll transform) and write to the inner
         // element + the slide's z-index, so we never clobber Embla's layout.
         const tween = () => {
           const vp = viewport.getBoundingClientRect();
           const cx = vp.left + vp.width / 2;
           const reach = vp.width * 0.6;
+          let closest = null;
+          let closestDist = Infinity;
           slides.forEach((slide) => {
             const inner = slide.firstElementChild;
             if (!inner) return;
@@ -279,34 +317,16 @@ const restaurantSchema = {
             inner.style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${scale})`;
             inner.style.opacity = String(1 - Math.min(0.45, abs * 0.4));
             slide.style.zIndex = String(100 - Math.round(abs * 100));
+            if (Math.abs(dx) < closestDist) {
+              closestDist = Math.abs(dx);
+              closest = slide;
+            }
           });
+          if (closest) setActive(idxOf(closest), closest);
         };
 
-        const syncSelected = () => {
-          const i = embla.selectedScrollSnap();
-          const slide = slides[i];
-          if (slide) {
-            numEl.textContent = String(i + 1).padStart(2, "0");
-            nameEl.textContent = slide.dataset.name || "";
-            priceEl.textContent = slide.dataset.price || "";
-          }
-          dotButtons.forEach((b, di) => {
-            b.style.background =
-              di === i ? "var(--color-ember)" : "rgba(245,237,224,0.25)";
-            b.style.width = di === i ? "18px" : "6px";
-          });
-        };
-
-        embla
-          .on("scroll", tween)
-          .on("slideFocus", tween)
-          .on("select", syncSelected)
-          .on("reInit", () => {
-            tween();
-            syncSelected();
-          });
+        embla.on("scroll", tween).on("slideFocus", tween).on("reInit", tween);
         tween();
-        syncSelected();
 
         embla.on("pointerDown", pauseThenResume);
         viewport.addEventListener("wheel", pauseThenResume, { passive: true });
