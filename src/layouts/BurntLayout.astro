@@ -298,17 +298,34 @@ const restaurantSchema = {
         // the readout updates live as you scroll. We measure the slide (which
         // carries Embla's own loop/scroll transform) and write to the inner
         // element + the slide's z-index, so we never clobber Embla's layout.
-        const tween = () => {
+        //
+        // Reads and writes are split into two passes: reading every slide's
+        // rect first and only then writing styles avoids layout thrashing
+        // (interleaving them forces a synchronous re-layout per card, which
+        // froze fast scrolling). The viewport centre is cached since it only
+        // changes on resize.
+        let cx = 0;
+        let reach = 1;
+        const measure = () => {
           const vp = viewport.getBoundingClientRect();
-          const cx = vp.left + vp.width / 2;
-          const reach = vp.width * 0.6;
+          cx = vp.left + vp.width / 2;
+          reach = vp.width * 0.6;
+        };
+        measure();
+
+        const centers = new Array(slides.length);
+        const tween = () => {
+          for (let i = 0; i < slides.length; i++) {
+            const r = slides[i].getBoundingClientRect();
+            centers[i] = r.left + r.width / 2;
+          }
           let closest = null;
           let closestDist = Infinity;
-          slides.forEach((slide) => {
+          for (let i = 0; i < slides.length; i++) {
+            const slide = slides[i];
             const inner = slide.firstElementChild;
-            if (!inner) return;
-            const r = slide.getBoundingClientRect();
-            const dx = r.left + r.width / 2 - cx;
+            if (!inner) continue;
+            const dx = centers[i] - cx;
             const clamped = Math.max(-1.4, Math.min(1.4, dx / reach));
             const abs = Math.abs(clamped);
             const y = abs * abs * 50;
@@ -317,15 +334,22 @@ const restaurantSchema = {
             inner.style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${scale})`;
             inner.style.opacity = String(1 - Math.min(0.45, abs * 0.4));
             slide.style.zIndex = String(100 - Math.round(abs * 100));
-            if (Math.abs(dx) < closestDist) {
-              closestDist = Math.abs(dx);
+            const adx = Math.abs(dx);
+            if (adx < closestDist) {
+              closestDist = adx;
               closest = slide;
             }
-          });
+          }
           if (closest) setActive(idxOf(closest), closest);
         };
 
-        embla.on("scroll", tween).on("slideFocus", tween).on("reInit", tween);
+        embla
+          .on("scroll", tween)
+          .on("slideFocus", tween)
+          .on("reInit", () => {
+            measure();
+            tween();
+          });
         tween();
 
         embla.on("pointerDown", pauseThenResume);
