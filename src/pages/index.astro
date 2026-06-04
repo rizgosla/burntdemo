@@ -237,32 +237,27 @@ const navLinks = [
     </div>
 
     <div class="relative mt-7 h-[540px]">
-      <!-- Embla viewport. The infinite loop + momentum is driven by Embla
-           (transform-based), so there's no native scroll-snap to fight when
-           flinging fast. The curved 3D look is layered on top in JS by
-           transforming each card's inner wrapper based on its distance from
-           the viewport centre. -->
-      <div id="carousel" class="absolute inset-0 overflow-hidden [perspective:1200px]" data-count={dishes.length}>
-        <div class="burnt-track flex h-full gap-[18px]">
-          {[0, 1, 2].flatMap(() => dishes).map((d, i) => (
-            <div
-              class="burnt-card flex-[0_0_220px]"
-              data-idx={i % dishes.length}
-              data-name={d.name.join(" ")}
-              data-price={d.price}
-            >
-              <div class="burnt-card-inner relative h-[360px] origin-bottom overflow-hidden rounded-[18px] bg-[#2a1d15] shadow-[0_30px_60px_rgba(0,0,0,0.4)] [will-change:transform,opacity]">
-                <img src={`${M}/${d.img}`} alt={d.name.join(" ")} class="block h-full w-full object-cover" />
-                <span class="absolute left-3 top-3 rounded bg-ember px-[7px] py-1 font-display text-[9.5px] font-semibold uppercase tracking-[0.18em] text-paper">{d.badge}</span>
-                <span class="absolute right-3 top-3 rounded-full bg-paper px-[9px] py-1 font-display text-xs font-bold text-char">{d.price}</span>
-                <div class="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.75)_100%)] p-3.5 pt-10">
-                  <div class="font-display text-xl font-bold uppercase leading-[1.05]" set:html={d.name.join("<br/>")}></div>
-                  <div class="mt-1 font-serif text-xs italic text-paper/70">{d.sub}</div>
-                </div>
-              </div>
+      <!-- Native horizontal scroll (momentum runs off the main thread, so a
+           fast fling can never lock up). Finite — 8 cards, no loop. The curved
+           3D look is layered on in JS using offsetLeft (layout-only, no reflow)
+           in BurntLayout. -->
+      <div id="carousel" class="burnt-no-scrollbar absolute inset-0 flex snap-x snap-mandatory gap-[18px] overflow-x-auto px-[calc(50%-110px)] [perspective:1200px]">
+        {dishes.map((d, i) => (
+          <div
+            class="burnt-card relative h-[360px] flex-[0_0_220px] origin-bottom snap-center overflow-hidden rounded-[18px] bg-[#2a1d15] shadow-[0_30px_60px_rgba(0,0,0,0.4)] [will-change:transform,opacity]"
+            data-idx={i}
+            data-name={d.name.join(" ")}
+            data-price={d.price}
+          >
+            <img src={`${M}/${d.img}`} alt={d.name.join(" ")} class="block h-full w-full object-cover" />
+            <span class="absolute left-3 top-3 rounded bg-ember px-[7px] py-1 font-display text-[9.5px] font-semibold uppercase tracking-[0.18em] text-paper">{d.badge}</span>
+            <span class="absolute right-3 top-3 rounded-full bg-paper px-[9px] py-1 font-display text-xs font-bold text-char">{d.price}</span>
+            <div class="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.75)_100%)] p-3.5 pt-10">
+              <div class="font-display text-xl font-bold uppercase leading-[1.05]" set:html={d.name.join("<br/>")}></div>
+              <div class="mt-1 font-serif text-xs italic text-paper/70">{d.sub}</div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
 

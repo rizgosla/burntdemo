@@ -148,10 +148,138 @@ const restaurantSchema = {
           });
         }
 
-        // ── Curved carousel ─────────────────────────────────────────────────
-        // Powered by Embla (see the bundled <script> below). Embla owns the
-        // infinite loop + momentum via transforms — no native scroll-snap to
-        // fight when flinging fast — and we layer the curved 3D look on top.
+        // ── Curved carousel (native scroll, finite 8 cards) ─────────────────
+        // Native horizontal scroll handles momentum (often off the main
+        // thread), so a fast fling can never lock up. No loop / clones / JS
+        // repositioning — that machinery is what used to jump or freeze.
+        const carousel = $("#carousel");
+        if (carousel) {
+          const cards = $$(".burnt-card", carousel);
+          const dots = $("#carousel-dots");
+          const numEl = $("#ci-num");
+          const nameEl = $("#ci-name");
+          const priceEl = $("#ci-price");
+
+          // Card centre within the scroll content. offsetLeft is a layout value
+          // that CSS transforms don't affect, so reading it never forces a
+          // reflow even though we write transforms each frame — that's what
+          // keeps fast scrolling smooth.
+          const centerOf = (card) => card.offsetLeft + card.offsetWidth / 2;
+
+          let activeIdx = -1;
+          const setActive = (i) => {
+            if (i === activeIdx) return;
+            activeIdx = i;
+            const card = cards[i];
+            numEl.textContent = String(i + 1).padStart(2, "0");
+            if (card) {
+              nameEl.textContent = card.dataset.name || "";
+              priceEl.textContent = card.dataset.price || "";
+            }
+            $$(".burnt-dot", dots).forEach((b, di) => {
+              b.style.background =
+                di === i ? "var(--color-ember)" : "rgba(245,237,224,0.25)";
+              b.style.width = di === i ? "18px" : "6px";
+            });
+          };
+
+          // Auto-advance; any direct input pauses it, resuming after idle. At
+          // the end it eases back to the first card.
+          let step = 0;
+          let autoTimer = null;
+          let resumeTimer = null;
+          const stopAuto = () => {
+            clearInterval(autoTimer);
+            autoTimer = null;
+          };
+          const startAuto = () => {
+            if (reduceMotion || autoTimer || !step) return;
+            autoTimer = setInterval(() => {
+              const atEnd =
+                carousel.scrollLeft + carousel.clientWidth >=
+                carousel.scrollWidth - 4;
+              if (atEnd) carousel.scrollTo({ left: 0, behavior: "smooth" });
+              else carousel.scrollBy({ left: step, behavior: "smooth" });
+            }, 3500);
+          };
+          const pauseThenResume = () => {
+            stopAuto();
+            clearTimeout(resumeTimer);
+            resumeTimer = setTimeout(startAuto, 5000);
+          };
+
+          // One dot per dish; click centres that card.
+          cards.forEach((card, i) => {
+            const b = document.createElement("button");
+            b.className = "burnt-dot";
+            b.setAttribute("aria-label", `Go to dish ${i + 1}`);
+            b.style.cssText =
+              "width:6px;height:6px;border-radius:99px;background:rgba(245,237,224,0.25);border:0;padding:0;transition:width 200ms,background 200ms;";
+            b.addEventListener("click", () => {
+              pauseThenResume();
+              carousel.scrollTo({
+                left: centerOf(card) - carousel.clientWidth / 2,
+                behavior: "smooth",
+              });
+            });
+            dots.appendChild(b);
+          });
+
+          // Curved look + live readout. Reads only scrollLeft / offsetLeft and
+          // writes only transforms, so there's no layout thrashing.
+          const update = () => {
+            const cw = carousel.clientWidth;
+            const center = carousel.scrollLeft + cw / 2;
+            const reach = cw * 0.6;
+            let closest = 0;
+            let closestDist = Infinity;
+            for (let i = 0; i < cards.length; i++) {
+              const dx = centerOf(cards[i]) - center;
+              const clamped = Math.max(-1.4, Math.min(1.4, dx / reach));
+              const abs = Math.abs(clamped);
+              const y = abs * abs * 50;
+              const rot = clamped * 10;
+              const scale = 1 - Math.min(0.18, abs * 0.16);
+              cards[i].style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${scale})`;
+              cards[i].style.opacity = String(1 - Math.min(0.45, abs * 0.4));
+              cards[i].style.zIndex = String(100 - Math.round(abs * 100));
+              const adx = Math.abs(dx);
+              if (adx < closestDist) {
+                closestDist = adx;
+                closest = i;
+              }
+            }
+            setActive(closest);
+          };
+
+          // Throttle to one update per animation frame, no matter how many
+          // scroll events fire.
+          let ticking = false;
+          carousel.addEventListener(
+            "scroll",
+            () => {
+              if (ticking) return;
+              ticking = true;
+              requestAnimationFrame(() => {
+                update();
+                ticking = false;
+              });
+            },
+            { passive: true }
+          );
+          ["pointerdown", "touchstart", "wheel", "keydown"].forEach((ev) =>
+            carousel.addEventListener(ev, pauseThenResume, { passive: true })
+          );
+          carousel.addEventListener("mouseenter", stopAuto);
+          carousel.addEventListener("mouseleave", startAuto);
+
+          requestAnimationFrame(() => {
+            step =
+              cards.length > 1 ? centerOf(cards[1]) - centerOf(cards[0]) : 0;
+            update();
+            startAuto();
+          });
+        }
 
         // ── Mobile menu toggle ──────────────────────────────────────────────
         const menuBtn = $("#burnt-menu-btn");
@@ -194,170 +322,6 @@ const restaurantSchema = {
         );
         requestAnimationFrame(onScroll);
       })();
-    </script>
-
-    <!-- Curved "classics you came for" carousel, powered by Embla. This is a
-         bundled module script (not is:inline) so the npm imports are processed
-         by Astro/Vite. -->
-    <script>
-      import EmblaCarousel from "embla-carousel";
-      import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
-
-      const viewport = document.querySelector("#carousel");
-      if (viewport) {
-        const reduceMotion = window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches;
-
-        const numEl = document.querySelector("#ci-num");
-        const nameEl = document.querySelector("#ci-name");
-        const priceEl = document.querySelector("#ci-price");
-        const dotsWrap = document.querySelector("#carousel-dots");
-
-        // Embla drives the infinite loop and momentum with transforms, so a
-        // fast fling never fights native scroll-snap (the old "jump"). The
-        // wheel-gestures plugin keeps trackpad / mouse-wheel scrolling working.
-        const embla = EmblaCarousel(
-          viewport,
-          { loop: true, align: "center", dragFree: false, containScroll: false },
-          [WheelGesturesPlugin()]
-        );
-
-        const slides = embla.slideNodes();
-        // Unique dish count. Slides are rendered in repeated sets (see
-        // index.astro) so Embla always has enough cards to wrap the loop on any
-        // viewport width — each card is tagged with its logical dish index.
-        const N = Number(viewport.dataset.count) || slides.length;
-        const idxOf = (slide) => Number(slide.dataset.idx) || 0;
-
-        // Auto-advance; any direct interaction pauses it, and it resumes after
-        // a few idle seconds. Declared early so the dot handlers can call it.
-        let autoTimer = null;
-        let resumeTimer = null;
-        const stopAuto = () => {
-          clearInterval(autoTimer);
-          autoTimer = null;
-        };
-        const startAuto = () => {
-          if (reduceMotion || autoTimer) return;
-          autoTimer = setInterval(() => embla.scrollNext(), 3500);
-        };
-        const pauseThenResume = () => {
-          stopAuto();
-          clearTimeout(resumeTimer);
-          resumeTimer = setTimeout(startAuto, 5000);
-        };
-
-        // One dot per unique dish.
-        const dotButtons = Array.from({ length: N }, (_, i) => {
-          const b = document.createElement("button");
-          b.className = "burnt-dot";
-          b.setAttribute("aria-label", `Go to dish ${i + 1}`);
-          b.style.cssText =
-            "width:6px;height:6px;border-radius:99px;background:rgba(245,237,224,0.25);border:0;padding:0;transition:width 200ms,background 200ms;";
-          b.addEventListener("click", () => {
-            pauseThenResume();
-            // Jump to whichever copy of this dish is nearest the current slide.
-            const cur = embla.selectedScrollSnap();
-            let best = cur;
-            let bestDist = Infinity;
-            slides.forEach((s, si) => {
-              if (idxOf(s) !== i) return;
-              const d = Math.abs(si - cur);
-              if (d < bestDist) {
-                bestDist = d;
-                best = si;
-              }
-            });
-            embla.scrollTo(best);
-          });
-          dotsWrap.appendChild(b);
-          return b;
-        });
-
-        // Live readout (number / name / price + active dot) follows whichever
-        // card is currently centred. Only writes when the logical dish changes.
-        let activeIdx = -1;
-        const setActive = (logical, slide) => {
-          if (logical === activeIdx) return;
-          activeIdx = logical;
-          numEl.textContent = String(logical + 1).padStart(2, "0");
-          if (slide) {
-            nameEl.textContent = slide.dataset.name || "";
-            priceEl.textContent = slide.dataset.price || "";
-          }
-          dotButtons.forEach((b, di) => {
-            b.style.background =
-              di === logical ? "var(--color-ember)" : "rgba(245,237,224,0.25)";
-            b.style.width = di === logical ? "18px" : "6px";
-          });
-        };
-
-        // Curved 3D look: transform each card's inner wrapper by how far its
-        // centre sits from the viewport centre, and track the closest card so
-        // the readout updates live as you scroll. We measure the slide (which
-        // carries Embla's own loop/scroll transform) and write to the inner
-        // element + the slide's z-index, so we never clobber Embla's layout.
-        //
-        // Reads and writes are split into two passes: reading every slide's
-        // rect first and only then writing styles avoids layout thrashing
-        // (interleaving them forces a synchronous re-layout per card, which
-        // froze fast scrolling). The viewport centre is cached since it only
-        // changes on resize.
-        let cx = 0;
-        let reach = 1;
-        const measure = () => {
-          const vp = viewport.getBoundingClientRect();
-          cx = vp.left + vp.width / 2;
-          reach = vp.width * 0.6;
-        };
-        measure();
-
-        const centers = new Array(slides.length);
-        const tween = () => {
-          for (let i = 0; i < slides.length; i++) {
-            const r = slides[i].getBoundingClientRect();
-            centers[i] = r.left + r.width / 2;
-          }
-          let closest = null;
-          let closestDist = Infinity;
-          for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i];
-            const inner = slide.firstElementChild;
-            if (!inner) continue;
-            const dx = centers[i] - cx;
-            const clamped = Math.max(-1.4, Math.min(1.4, dx / reach));
-            const abs = Math.abs(clamped);
-            const y = abs * abs * 50;
-            const rot = clamped * 10;
-            const scale = 1 - Math.min(0.18, abs * 0.16);
-            inner.style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${scale})`;
-            inner.style.opacity = String(1 - Math.min(0.45, abs * 0.4));
-            slide.style.zIndex = String(100 - Math.round(abs * 100));
-            const adx = Math.abs(dx);
-            if (adx < closestDist) {
-              closestDist = adx;
-              closest = slide;
-            }
-          }
-          if (closest) setActive(idxOf(closest), closest);
-        };
-
-        embla
-          .on("scroll", tween)
-          .on("slideFocus", tween)
-          .on("reInit", () => {
-            measure();
-            tween();
-          });
-        tween();
-
-        embla.on("pointerDown", pauseThenResume);
-        viewport.addEventListener("wheel", pauseThenResume, { passive: true });
-        viewport.addEventListener("mouseenter", stopAuto);
-        viewport.addEventListener("mouseleave", startAuto);
-        if (!reduceMotion) startAuto();
-      }
     </script>
   </body>
 </html>
