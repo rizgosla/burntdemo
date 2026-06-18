@@ -141,10 +141,18 @@ const restaurantSchema = {
             const imgs = $$(".burnt-frames img", stage);
             if (!imgs.length) return;
             let idx = 0;
+            // Pre-render next frame underneath the current one so it loads before its turn
+            if (imgs.length > 1) imgs[1].classList.add("preload");
             setInterval(() => {
+              const next = (idx + 1) % imgs.length;
+              const upcoming = (idx + 2) % imgs.length;
+              // Promote next (already loaded underneath) to current
+              imgs[next].classList.remove("preload");
+              imgs[next].classList.add("on");
               imgs[idx].classList.remove("on");
-              idx = (idx + 1) % imgs.length;
-              imgs[idx].classList.add("on");
+              idx = next;
+              // Start rendering the frame after next underneath, so it's ready in time
+              imgs[upcoming].classList.add("preload");
             }, 500);
           });
         }
