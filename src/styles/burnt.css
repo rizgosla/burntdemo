@@ -97,9 +97,16 @@ body {
   object-position: center center;
   opacity: 0;
   transition: opacity 60ms linear;
+  z-index: 0;
 }
 .burnt-frames img.on {
   opacity: 1;
+  z-index: 2;
+}
+/* Next frame pre-rendered underneath so it's loaded before its turn */
+.burnt-frames img.preload {
+  opacity: 1;
+  z-index: 1;
 }
 
 /* ── Hide scrollbars on snap rows ────────────────────────── */
